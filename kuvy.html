@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kuvy</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .main-container {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+        
+        .floating-container {
+            position: relative;
+            width: 300px;
+            height: 340px;
+            animation: floating 5s ease-in-out infinite;
+            text-align: center;
+        }
+
+        .floating-container img {
+            width: 100%;
+            height: 300px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+        }
+
+        .floating-text {
+            margin-top: 10px;
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+            animation: floating-text 5s ease-in-out infinite;
+        }
+
+        .disc-container {
+            width: 120px;
+            height: 120px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .disc-container:hover {
+            transform: scale(1.05);
+        }
+
+        .disc {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-image: url('disc.png');
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: spin-slow 8s linear infinite;
+        }
+
+        .disc.fast-spin {
+            animation: spin-fast 0.3s linear infinite;
+        }
+
+        @keyframes floating {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes floating-text {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin-slow {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin-fast {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="floating-container">
+            <img src="WSSF.png" alt="kuvy.xyz">
+            <div class="floating-text">music</div>
+        </div>
+        
+        <div class="disc-container" onclick="spinAndNavigate()">
+            <div class="disc" id="disc"></div>
+        </div>
+    </div>
+
+    <script>
+        let isSpinning = false;
+        let slowDownTimeout;
+
+        function spinAndNavigate() {
+            if (isSpinning) return;
+            
+            // First spin the disc
+            spinDisc();
+            
+            // Navigate after a delay (during the spin)
+            setTimeout(() => {
+                // Replace 'music.html' with your desired page
+                window.location.href = 'music.html';
+                
+                // Alternative options:
+                // window.location.href = 'https://example.com'; // External URL
+                // window.open('music.html', '_blank'); // Open in new tab
+            }, 1500); // Navigate after 1.5 seconds of spinning
+        }
+
+        function spinDisc() {
+            const disc = document.getElementById('disc');
+            isSpinning = true;
+            
+            // Clear any existing timeout
+            if (slowDownTimeout) {
+                clearTimeout(slowDownTimeout);
+            }
+            
+            // Add fast spin class
+            disc.classList.add('fast-spin');
+            
+            // Start slowing down after 1 second
+            slowDownTimeout = setTimeout(() => {
+                slowDown();
+            }, 1000);
+        }
+
+        function slowDown() {
+            const disc = document.getElementById('disc');
+            
+            // Remove fast spin class
+            disc.classList.remove('fast-spin');
+            
+            // Smooth continuous slowdown using requestAnimationFrame
+            let currentSpeed = 0.3; // Start from fast speed (0.3s per rotation)
+            const targetSpeed = 8;   // End at normal speed (8s per rotation)
+            const slowdownDuration = 4000; // 4 seconds total slowdown time
+            const startTime = Date.now();
+            
+            function updateSpeed() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / slowdownDuration, 1);
+                
+                // Use easing function for natural deceleration
+                const easedProgress = 1 - Math.pow(1 - progress, 3); // cubic ease-out
+                
+                // Interpolate between current and target speed
+                const speed = currentSpeed + (targetSpeed - currentSpeed) * easedProgress;
+                disc.style.animationDuration = speed + 's';
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateSpeed);
+                } else {
+                    // Cleanup when done
+                    disc.style.animationDuration = '';
+                    isSpinning = false;
+                }
+            }
+            
+            requestAnimationFrame(updateSpeed);
+        }
+    </script>
+</body>
+</html>
