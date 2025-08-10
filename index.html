@@ -142,18 +142,12 @@
         function spinAndNavigate() {
             if (isSpinning) return;
             
-            // First spin the disc
             spinDisc();
             
-            // Navigate after a delay (during the spin)
             setTimeout(() => {
-                // Replace 'music.html' with your desired page
-                window.location.href = 'music.html';
                 
-                // Alternative options:
-                // window.location.href = 'https://example.com'; // External URL
-                // window.open('music.html', '_blank'); // Open in new tab
-            }, 1500); // Navigate after 1.5 seconds of spinning
+                window.location.href = 'music';
+            }, 1500); 
         }
 
         function spinDisc() {
@@ -177,30 +171,24 @@
         function slowDown() {
             const disc = document.getElementById('disc');
             
-            // Remove fast spin class
             disc.classList.remove('fast-spin');
             
-            // Smooth continuous slowdown using requestAnimationFrame
-            let currentSpeed = 0.3; // Start from fast speed (0.3s per rotation)
-            const targetSpeed = 8;   // End at normal speed (8s per rotation)
-            const slowdownDuration = 4000; // 4 seconds total slowdown time
+            let currentSpeed = 0.3; 
+            const targetSpeed = 8;   
+            const slowdownDuration = 4000;
             const startTime = Date.now();
             
             function updateSpeed() {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / slowdownDuration, 1);
                 
-                // Use easing function for natural deceleration
-                const easedProgress = 1 - Math.pow(1 - progress, 3); // cubic ease-out
-                
-                // Interpolate between current and target speed
+                const easedProgress = 1 - Math.pow(1 - progress, 3); 
                 const speed = currentSpeed + (targetSpeed - currentSpeed) * easedProgress;
                 disc.style.animationDuration = speed + 's';
                 
                 if (progress < 1) {
                     requestAnimationFrame(updateSpeed);
                 } else {
-                    // Cleanup when done
                     disc.style.animationDuration = '';
                     isSpinning = false;
                 }
